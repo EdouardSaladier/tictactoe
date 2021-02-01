@@ -5,88 +5,65 @@
 
 
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QGridLayout
 
 #
 class Fenetre(QWidget):
-    def __init__(self):
+    def __init__(self, ):
+        self.board = [[" ", " ", " "], [" ", " ", " "], [" ", " ", " "]]
+        self.player = ['X', 'O']
+        self.i = 0
+
         QWidget.__init__(self)
         self.setWindowTitle("Ma fenetre")
+        self.initUI()
 
-# Le jeu du tic-tac-toe.
-def game ():
+   
 
-    board = [
-        [" ", " ", " "],
-        [" ", " ", " "],
-        [" ", " ", " "]
-    ]
-    # On fait des tours de jeu tant que le jeu ne s'arrÃªte pas sur une
-    # victoire oÃ¹ une Ã©galitÃ©.
-    while True:
-        turn (board)
+    def paintEvent(self, e):
+        pass
 
-# Un tour de jeu consiste Ã  faire jouer le joueur des croix puis le joueur
-# des cercles.
-def turn (board):
-    play ("X", board)
-    play ("O", board)
+    def initUI(self):
+        grid = QGridLayout(self)
 
-# Les tours de jeu sont similaires pour les deux joueurs:
-def play (player, board):
-    # D'abord, on affiche le plateau.
-    print_board (board)
-    # Ensuite, on regarde si la partie n'est pas dÃ©jÃ  terminÃ©e parce
-    # qu'il n'y a plus de coup possible. Si la partie est terminÃ©e,
-    # le programme sera arrÃªtÃ© par la procÃ©dure suivante:
-    check_for_tie (board)
-    # Si la partie n'est pas terminÃ©e alors on demande son choix au
-    # joueur en lui demandant de choisir une ligne puis une colonne
-    # dans la grille.
-    print ("C'est au tour du joueur " + player + ".")
-    print ("Ligne? (0, 1 ou 2)")
-    line = int (input ())
-    print ("Colonne? (0, 1 ou 2)")
-    column = int (input ())
-    # Bien sÃ»r, on ne peut jouer que dans les cases vides. On teste
-    # donc si la case choisie est vide.
-    if board[line][column] == " ":
-        # Si oui, on modifie le plateau pour y mettre le symbole du
-        # joueur.
-        board[line][column] = player
-        # On vÃ©rifie maintenant si le joueur a alignÃ© trois cases
-        # identiques.
-        check_if_game_is_won (player, board)
-    else:
-        # Ã‰crire dans une case non vide stoppe le jeu.
-        invalid_choice ()
+        self.grille = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+        for i in range(3):
+            for j in range(3):
+                self.grille[i][j] = QPushButton('', self)
+                self.grille[i][j].clicked.connect(lambda _, val=(i, j): self.cb(val))
+                grid.addWidget(self.grille[i][j], i, j)
 
-# Affiche le plateau de jeu.
-def print_board (board):
-    # On affiche la premiÃ¨re ligne.
-    print ("-------")
-    # Pour toutes les lignes numÃ©rotÃ©es de 0 Ã  2:
-    for i in range (0, 3):
-        # et pour toutes les colonnes numÃ©rotÃ©es de 0 Ã  2:
-        for j in range (0, 3):
-            # On affiche le contenu de la case Ã  la i-Ã¨me ligne et Ã 
-            # la j-iÃ¨me colonne prÃ©cÃ©dÃ© d'une barre de sÃ©paration.
-            print ("|" + board[i][j], end="")
-        # La barre suivante termine la ligne:
-        print ("|")
-        # Et voici pour finir une ligne de sÃ©paration.
-        print ("-------")
+        self.setLayout(grid)
+
+    def play(self):
+        self.i = (self.i + 1)%2
+        return self.player[self.i]
+
+
+    def cb(self, coords):
+        
+
+        i = coords[0]
+        j = coords[1]
+        play = self.play()
+        self.grille[i][j].setText(play)
+        self.board[i][j] = play
+        check_for_tie(self.board)
+        check_if_game_is_won(play, self.board)
+        
+
+
+
+
 
 # Pour savoir si un joueur a gagnÃ©, on teste les lignes, les colonnes
 # et les diagonales de la grille pour vÃ©rifier s'il a un alignement.
 def check_if_game_is_won (player, board):
-    # Ici, on met les lignes, les colonnes et les diagonales dans une
-    # mÃªme liste en les concatÃ©nant Ã  l'aide de l'opÃ©rateur +.
     check_alignments (player, lines (board) + columns (board) + diagonals (board))
 
 # Un alignement est une sÃ©quence des 3 symboles du joueur.
 def check_alignment_for (player, line):
-    if line == player * 3:
+    if line == [player, player, player]:
         game_is_over (player)
 
 # On va tester tous les alignements possibles de la grille.
@@ -136,7 +113,7 @@ def check_for_tie (board):
     if count_empty_cells (board) == 0:
         # S'il ne reste plus de case, alors la partie est terminÃ©e sur
         # une Ã©galitÃ©.
-        print ("EgalitÃ©!")
+        print ("Egality!")
         sys.exit (0)
 
 # La procÃ©dure suivante arrÃªte le programme suite Ã  un coup invalide.
@@ -145,17 +122,20 @@ def invalid_choice ():
     sys.exit (0)
 
 # La procÃ©dure suivante annonce le vainqueur et stoppe le programme.
-def game_is_over (player, board):
-    print (player + " a gagnÃ©!")
-    print_board (board)
+def game_is_over (player):
+    print (player + " a gagné!")
     sys.exit (0)
 
 # Le programme principal
-#########################
 if __name__ == "__main__":
 
+    
+    app = QApplication.instance() 
+    if not app:
+        app = QApplication(sys.argv)
+
+        
     fen = Fenetre()
     fen.show()
-    app.exec_()
-    game ()
-    print_board (board)
+
+    sys.exit(app.exec_())
