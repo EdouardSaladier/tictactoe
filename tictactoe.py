@@ -8,7 +8,7 @@ class Fenetre(QWidget):
         self.i = 0
 
         QWidget.__init__(self)
-        self.setWindowTitle("Ma fenetre")
+        self.setWindowTitle("Au tour de O")
         self.initUI()
 
    
@@ -38,6 +38,7 @@ class Fenetre(QWidget):
 
         i = coords[0]
         j = coords[1]
+        self.setWindowTitle("Au tour de "+self.player[self.i])
         play = self.play()
         self.grille[i][j].setText(play)
         self.board[i][j] = play
